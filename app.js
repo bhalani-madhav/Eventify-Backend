@@ -1,6 +1,7 @@
 const express = require("express");
 const { sequelize } = require("./models");
 const userRoutes = require("./routes/userRoutes");
+const reminderRoutes = require("./routes/reminderRoutes");
 const passport = require("passport");
 const {initializePassport} = require('./auth/passportConfig');
 const cookieParser = require("cookie-parser");
@@ -18,6 +19,7 @@ initializePassport(passport);
 
 //routes
 app.use("/", userRoutes);
+app.use("/reminder", reminderRoutes);
 
 //authenticate connection
 const connect = async () => {

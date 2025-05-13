@@ -25,17 +25,36 @@ module.exports = (sequelize, DataTypes) => {
     title:{
       type: DataTypes.STRING(100),
       allowNull: false,  
-    
+      validate: {
+        notEmpty:{
+          args: true,
+          msg: "Title is required!!"
+        },
+        max:{
+          args: 100,
+          msg: "The title cannot exceed 100 characters!!"
+        }
+      }
     },
     description:{
         type: DataTypes.STRING(500),
-        allowNull: false
+        allowNull: false,
+        validate: {
+          notEmpty:{
+            args: true,
+            msg: "Title is required!!"
+          },
+          max:{
+            args: 500,
+            msg: "The title cannot exceed 500 characters!!"
+          }
+        }
     },
     date:{
         type: DataTypes.DATEONLY,
         allowNull: false,
         validate: {
-            isDate: true
+            isDate: {msg: 'Please enter a valid date!!'}
         }
     },
     createdAt: {
