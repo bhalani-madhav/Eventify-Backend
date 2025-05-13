@@ -2,6 +2,7 @@ const { Users } = require("../models/");
 const bcrypt = require("bcrypt");
 const key = "santaClause90*32@@";
 const jwt = require("jsonwebtoken");
+const { ValidationErrorItem } = require("sequelize");
 
 //function to handle user registration
 module.exports.registerUser = async (req, res) => {
@@ -48,8 +49,14 @@ module.exports.registerUser = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log("ERROR IN  REGISTERING USER:", err);
-    res.status(500).json({ error: "Internal Server Error!!" });
+    if (err.name === "SequelizeValidationError") {
+      err.errors.map((error) => {   
+        res.status(400).json({ error: error.message });
+      });
+    } else {
+      console.log("ERROR IN  REGISTERING USER:", err);
+      res.status(500).json({ error: "Internal Server Error!!" });
+    }
   }
 };
 
