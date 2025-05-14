@@ -9,4 +9,10 @@ router.post(
   reminder.createReminder
 );
 
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  reminder.viewReminders
+);
+
 module.exports = router;

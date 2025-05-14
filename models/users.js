@@ -23,10 +23,16 @@ module.exports = (sequelize, DataTypes) => {
       firstName: {
         type: DataTypes.STRING(50),
         allowNull: false,
+        validate: {
+          isAlpha: { msg: "First Name cannot contain digits or special characters" },
+        },
       },
       lastName: {
         type: DataTypes.STRING(50),
         allowNull: false,
+        validate: {
+          isAlpha: { msg: "Last Name cannot contain digits or special characters" },
+        },
       },
       email: {
         type: DataTypes.STRING(255),
@@ -42,11 +48,17 @@ module.exports = (sequelize, DataTypes) => {
       },
       createdAt: {
         type: DataTypes.DATE,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        // defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        validate: {
+          isDate: { msg: "Invalid date format" },
+        },
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        // defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        validate: {
+          isDate: { msg: "Invalid date format" },
+        },
       },
     },
     {

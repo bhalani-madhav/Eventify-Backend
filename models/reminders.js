@@ -30,23 +30,23 @@ module.exports = (sequelize, DataTypes) => {
           args: true,
           msg: "Title is required!!"
         },
-        max:{
-          args: 100,
+        len:{
+          args: [1, 100],
           msg: "The title cannot exceed 100 characters!!"
         }
       }
     },
     description:{
-        type: DataTypes.STRING(500),
+        type: DataTypes.TEXT(),
         allowNull: false,
         validate: {
           notEmpty:{
             args: true,
             msg: "Title is required!!"
           },
-          max:{
-            args: 500,
-            msg: "The title cannot exceed 500 characters!!"
+          len:{
+            args: [1, 500],
+            msg: "The description cannot exceed 500 characters!!"
           }
         }
     },

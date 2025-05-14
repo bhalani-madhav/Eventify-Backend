@@ -15,6 +15,7 @@ module.exports.registerUser = async (req, res) => {
         .status(409)
         .json({ error: "User already exists. Please sign in to continue.." });
     } else {
+      let currentDate = new Date(Date.now() + 19800000);
       const regex =
         /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-])[A-Za-z0-9#?!@$%^&*-]+$/;
       if (password === confirmPassword) {
@@ -26,6 +27,8 @@ module.exports.registerUser = async (req, res) => {
               lastName,
               email,
               password: hashedPassword,
+              updatedAt: currentDate,
+              createdAt: currentDate
             });
             await newUser.save();
             res
@@ -50,7 +53,7 @@ module.exports.registerUser = async (req, res) => {
     }
   } catch (err) {
     if (err.name === "SequelizeValidationError") {
-      err.errors.map((error) => {   
+      err.errors.map((error) => {
         res.status(400).json({ error: error.message });
       });
     } else {
