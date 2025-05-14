@@ -12,7 +12,24 @@ router.post(
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
-  reminder.viewReminders
+  reminder.pagination
 );
 
+router.put(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  reminder.editReminder
+);
+
+router.delete(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  reminder.deleteReminder
+);
+
+// router.get(
+//   "/pagination",
+//   passport.authenticate("jwt", { session: false }),
+//   reminder.pagination
+// );
 module.exports = router;
