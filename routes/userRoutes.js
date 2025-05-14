@@ -1,9 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const user = require("../controllers/userControllers");
+const passport = require("passport");
 
+router.get(
+  "/secret",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const user = req.user;
+    res.send(
+      "welcome authenticated user: "+
+      user.firstName + " " + user.lastName
+    );
+  }
+);
 router.post("/register", user.registerUser);
 router.post("/login", user.loginUser);
-router.post("/logout", user.logoutUser)
+router.post(
+  "/logout",
+  passport.authenticate("jwt", { session: false }),
+  user.logoutUser
+);
 
 module.exports = router;
