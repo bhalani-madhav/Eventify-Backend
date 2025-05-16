@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const user = require("../controllers/userControllers");
 const passport = require("passport");
+const { authCheck } = require("../auth/authCheck");
 
 router.get(
   "/secret",
@@ -9,8 +10,7 @@ router.get(
   (req, res) => {
     const user = req.user;
     res.send(
-      "welcome authenticated user: "+
-      user.firstName + " " + user.lastName
+      "welcome authenticated user: " + user.firstName + " " + user.lastName
     );
   }
 );
@@ -20,6 +20,12 @@ router.post(
   "/logout",
   passport.authenticate("jwt", { session: false }),
   user.logoutUser
+);
+
+router.get(
+  "/authCheck",
+  passport.authenticate("jwt", { session: false }),
+  authCheck
 );
 
 module.exports = router;
