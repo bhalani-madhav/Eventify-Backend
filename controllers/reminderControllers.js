@@ -1,30 +1,29 @@
-const { openDelimiter } = require("ejs");
 const { Reminders } = require("../models/");
 
 //function to create a new reminder
 module.exports.createReminder = async (req, res) => {
   const { title, description, date } = req.body;
+
   try {
     const userId = req.user.id;
     if (!userId) {
       req.status(401).json({ error: "Please login to continue.." });
     } else {
-      const currentDate = new Date(Date.now() + 19800000);
-      console.log("curr date", currentDate);
-      const formattedDate = currentDate.toISOString().split("T")[0];
-      if (date < formattedDate) {
+      const currentDate = new Date(Date.now());
+      const newDate = new Date(date);
+      // console.log("curr date", currentDate);
+      // const formattedDate = currentDate.toISOString().split("T")[0];
+      // const regex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
+      if (newDate < currentDate) {
         res.status(400).json({
-          error:
-            "Please enter a future date i.e. greater than " + formattedDate,
+          error: "Please enter a future date i.e. greater than " + currentDate,
         });
       } else {
         const newReminder = await Reminders.create({
           title,
           description,
-          date,
+          date: newDate,
           createdBy: userId,
-          createdAt: currentDate,
-          updatedAt: new Date(Date.now() + 19800000),
         });
 
         await newReminder.save();
@@ -52,9 +51,7 @@ module.exports.viewReminders = async (req, res) => {
     const userId = req.user.id;
     const reminders = await Reminders.findAll({ where: { createdBy: userId } });
     if (reminders && reminders.length != 0) {
-      res
-        .status(200)
-        .json({ message: "Reminders fetched successfully!!", reminders });
+      res.status(200).json({ reminders });
     } else {
       res.status(404).json({ error: "No reminders found!!" });
     }
@@ -127,8 +124,15 @@ module.exports.pagination = async (req, res) => {
     const userId = req.user.id;
     let page = req.query.page;
     const limit = 5;
+    const allReminders = await Reminders.findAll({
+      where: { createdBy: userId },
+    });
+    const maxPage = Math.ceil(allReminders.length / limit);
     if (!page) {
       page = 1;
+    }
+    if (page > maxPage) {
+      page = maxPage;
     }
     const offset = (page - 1) * limit;
     const reminders = await Reminders.findAll({
@@ -136,10 +140,9 @@ module.exports.pagination = async (req, res) => {
       offset: offset,
       where: { createdBy: userId },
     });
+
     if (reminders && reminders.length != 0) {
-      res
-        .status(200)
-        .json({ message: "Reminders fetched successfully!!", reminders });
+      res.status(200).json({ reminders, maxPage });
     } else {
       res.status(404).json({ error: "No reminders found!!" });
     }
