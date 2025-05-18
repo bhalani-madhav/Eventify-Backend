@@ -39,7 +39,7 @@ module.exports.createReminder = async (req, res) => {
       console.log("ERROR IN CREATING REMINDER", err);
       res.status(500).json({ error: "Internal Server Error!!" });
     }
-  } 
+  }
 };
 
 //function to get all reminders for a particular user
@@ -101,14 +101,19 @@ module.exports.editReminder = async (req, res) => {
 
 //function to delete a particular reminder
 module.exports.deleteReminder = async (req, res) => {
+  const userId = req.user.id;
   try {
     const reminderId = req.params.id;
     const reminder = await Reminders.findByPk(reminderId);
     if (!reminder) {
       res.status(404).json({ error: "No reminder with that id exists." });
     } else {
-      await Reminders.destroy({ where: { id: reminderId } });
-      res.status(200).json({ message: "Reminder deleted successfully!!" });
+      if (userId !== reminder.createdBy) {
+        res.status(401).json({ message: "Unauthorized!!" });
+      } else {
+        await Reminders.destroy({ where: { id: reminderId } });
+        res.status(200).json({ message: "Reminder deleted successfully!!" });
+      }
     }
   } catch (err) {
     console.log("ERROR IN DELETING REMINDER", err);
