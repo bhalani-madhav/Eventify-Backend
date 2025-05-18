@@ -1,3 +1,4 @@
+require("dotenv").config();
 const passport = require("passport");
 const JWTStrategy = require("passport-jwt").Strategy;
 const ExtractJWT = require("passport-jwt").ExtractJwt;
@@ -10,17 +11,16 @@ const cookieExtractor = (req) => {
   if (req && req.cookies) {
     token = req.cookies.jwt;
   }
-  console.log('Token: ', token);
+  console.log("Token: ", token);
   return token;
 };
 
 module.exports.initializePassport = (passport) => {
-  
   passport.use(
     new JWTStrategy(
       {
         jwtFromRequest: cookieExtractor,
-        secretOrKey: "santaClause90*32@@",
+        secretOrKey: process.env.JWT_SECRET,
       },
       async (jwtPayload, done) => {
         const user = await Users.findByPk(jwtPayload.sub);

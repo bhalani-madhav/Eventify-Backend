@@ -7,7 +7,6 @@ const { ValidationErrorItem } = require("sequelize");
 //function to handle user registration
 module.exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
-  console.log("HG BODY CONTENT: ", req.body);
   try {
     const user = await Users.findOne({ where: { email: email } });
     if (user) {
