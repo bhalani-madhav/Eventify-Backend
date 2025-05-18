@@ -13,8 +13,12 @@ module.exports.registerUser = async (req, res) => {
     if (user) {
       res
         .status(409)
-        .json({ error: "User already exists. Please sign in to continue.." });
+        .json({
+          message:
+            "Email already in use. Please use different email to sign up",
+        });
     } else {
+      let currentDate = new Date(Date.now() + 19800000);
       const regex =
         /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-])[A-Za-z0-9#?!@$%^&*-]+$/;
       if (password === confirmPassword) {
@@ -24,8 +28,10 @@ module.exports.registerUser = async (req, res) => {
             const newUser = await Users.create({
               firstName,
               lastName,
-              email,
+              email,  
               password: hashedPassword,
+              updatedAt: currentDate,
+              createdAt: currentDate,
             });
             await newUser.save();
             res
@@ -50,7 +56,7 @@ module.exports.registerUser = async (req, res) => {
     }
   } catch (err) {
     if (err.name === "SequelizeValidationError") {
-      err.errors.map((error) => {   
+      err.errors.map((error) => {
         res.status(400).json({ error: error.message });
       });
     } else {
@@ -65,9 +71,12 @@ module.exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await Users.findOne({ where: { email: email } });
+    
     if (!user) {
-      res.status(404).json({ error: "No user found. Please register!!" });
+      res.status(404).json({ message: "No user found. Please register!!" });
     } else {
+      const firstName = user.firstName;
+      const lastName = user.lastName;
       const verifyPassword = await bcrypt.compare(password, user.password);
       if (verifyPassword) {
         const token = jwt.sign({ sub: user.id }, key, { expiresIn: "1d" });
@@ -76,14 +85,14 @@ module.exports.loginUser = async (req, res) => {
           secure: true,
           sameSite: "Lax",
         });
-        res.status(200).json({ message: "Logged in successfully!!" });
+        res.status(200).json({ message: "Logged in successfully!!", firstName, lastName});
       } else {
         res.status(401).json({ message: "Please enter a correct password!!" });
       }
     }
   } catch (err) {
     console.log("ERROR IN LOGGING IN", err);
-    res.status(500).json({ error: "Internal Server Error!!" });
+    res.status(500).json({ messsage: "Internal Server Error!!" });
   }
 };
 

@@ -1,14 +1,21 @@
 const express = require("express");
 const { sequelize } = require("./models");
 const userRoutes = require("./routes/userRoutes");
+const reminderRoutes = require("./routes/reminderRoutes");
 const passport = require("passport");
-const {initializePassport} = require('./auth/passportConfig');
+const { initializePassport } = require("./auth/passportConfig");
 const cookieParser = require("cookie-parser");
-
+const cors = require("cors");
 
 const app = express();
 const PORT = 3000;
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -18,6 +25,7 @@ initializePassport(passport);
 
 //routes
 app.use("/", userRoutes);
+app.use("/reminder", reminderRoutes);
 
 //authenticate connection
 const connect = async () => {
