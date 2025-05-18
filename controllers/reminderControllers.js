@@ -130,24 +130,28 @@ module.exports.pagination = async (req, res) => {
     const allReminders = await Reminders.findAll({
       where: { createdBy: userId },
     });
-    const maxPage = Math.ceil(allReminders.length / limit);
-    if (!page) {
-      page = 1;
-    }
-    if (page > maxPage) {
-      page = maxPage;
-    }
-    const offset = (page - 1) * limit;
-    const reminders = await Reminders.findAll({
-      limit: limit,
-      offset: offset,
-      where: { createdBy: userId },
-    });
-
-    if (reminders && reminders.length != 0) {
-      res.status(200).json({ reminders, maxPage });
+    if (allReminders.length === 0) {
+      res.status(200).json({ reminders: [] });
     } else {
-      res.status(404).json({ error: "No reminders found!!" });
+      const maxPage = Math.ceil(allReminders.length / limit);
+      if (!page) {
+        page = 1;
+      }
+      if (page > maxPage) {
+        page = maxPage;
+      }
+      const offset = (page - 1) * limit;
+      const reminders = await Reminders.findAll({
+        limit: limit,
+        offset: offset,
+        where: { createdBy: userId },
+      });
+
+      if (reminders && reminders.length != 0) {
+        res.status(200).json({ reminders, maxPage });
+      } else {
+        res.status(404).json({ error: "No reminders found!!" });
+      }
     }
   } catch (err) {
     console.log("ERROR IN FETCHING REMINDERS", err);

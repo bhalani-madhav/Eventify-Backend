@@ -11,12 +11,9 @@ module.exports.registerUser = async (req, res) => {
   try {
     const user = await Users.findOne({ where: { email: email } });
     if (user) {
-      res
-        .status(409)
-        .json({
-          message:
-            "Email already in use. Please use different email to sign up",
-        });
+      res.status(409).json({
+        message: "Email already in use. Please use different email to sign up",
+      });
     } else {
       let currentDate = new Date(Date.now() + 19800000);
       const regex =
@@ -28,7 +25,7 @@ module.exports.registerUser = async (req, res) => {
             const newUser = await Users.create({
               firstName,
               lastName,
-              email,  
+              email,
               password: hashedPassword,
               updatedAt: currentDate,
               createdAt: currentDate,
@@ -39,19 +36,19 @@ module.exports.registerUser = async (req, res) => {
               .json({ message: "User registered successfully!!", newUser });
           } else {
             res.status(400).json({
-              error:
+              message:
                 "The password must contain one uppercase letter, one lowercase letter, one digit and one special character.",
             });
           }
         } else {
           res
             .status(400)
-            .json({ error: "Password must be at least 8 characters!!" });
+            .json({ message: "Password must be at least 8 characters!!" });
         }
       } else {
         res
           .status(400)
-          .json({ error: "Please enter the same password as above." });
+          .json({ message: "Please enter the same password as above." });
       }
     }
   } catch (err) {
@@ -71,7 +68,7 @@ module.exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await Users.findOne({ where: { email: email } });
-    
+
     if (!user) {
       res.status(404).json({ message: "No user found. Please register!!" });
     } else {
@@ -85,7 +82,9 @@ module.exports.loginUser = async (req, res) => {
           secure: true,
           sameSite: "Lax",
         });
-        res.status(200).json({ message: "Logged in successfully!!", firstName, lastName});
+        res
+          .status(200)
+          .json({ message: "Logged in successfully!!", firstName, lastName });
       } else {
         res.status(401).json({ message: "Please enter a correct password!!" });
       }
