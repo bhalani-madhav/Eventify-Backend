@@ -1,452 +1,144 @@
-# Practice Project with Sequelize and Express
 
-This is a practice project using **Sequelize** (Node.js ORM), **sequelize-cli** (for migrations and models), **Express** (web framework), and **PostgreSQL** as the database. This `README.md` serves as a quick reference for essential Sequelize, sequelize-cli, and Express commands and syntax.
+# Eventify – Backend
 
-## Project Setup
+This is the backend for **Eventify**, built using **Node.js**, **Express**, **PostgreSQL**, and **Sequelize** ORM.
 
-### Prerequisites
-- **Node.js** (v14 or higher)
-- **PostgreSQL** (installed and running) 
-- **npm** (Node package manager)
-- A PostgreSQL database (e.g., `practice_db`)
+---
 
-### Installation
-1. **Initialize a Node.js project**:
-   ```bash
-   npm init -y
-   ```
+## 🛠️ Tech Stack
 
-2. **Install dependencies**:
-   ```bash
-   npm install express sequelize sequelize-cli pg pg-hstore
-   ```
-   - `express`: Web framework
-   - `sequelize`: ORM for PostgreSQL
-   - `sequelize-cli`: Command-line tool for migrations and models
-   - `pg`, `pg-hstore`: PostgreSQL driver for Sequelize
+- [Node.js](https://nodejs.org/)
+- [Express.js](https://expressjs.com/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Sequelize](https://sequelize.org/)
+- [Passport.js](http://www.passportjs.org/) (for JWT authentication)
+- [dotenv](https://www.npmjs.com/package/dotenv) for environment configuration
 
-3. **Create a PostgreSQL database**:
-   ```bash
-   createdb practice_db
-   ```
-   Or use a PostgreSQL client (e.g., `psql`):
-   ```sql
-   CREATE DATABASE practice_db;
-   ```
+---
 
-4. **Initialize Sequelize**:
-   ```bash
-   npx sequelize init
-   ```
-   This creates:
-   - `config/config.json`: Database configuration
-   - `models/`: Model files
-   - `migrations/`: Migration files
-   - `seeders/`: Seeder files
+## 📦 Getting Started
 
-5. **Configure Sequelize**:
-   Edit `config/config.json` to match your PostgreSQL setup:
-   ```json
-   {
-     "development": {
-       "username": "your_username",
-       "password": "your_password",
-       "database": "practice_db",
-       "host": "localhost",
-       "port": 5432,
-       "dialect": "postgres"
-     }
-   }
-   ```
+Follow these steps to set up and run the backend locally.
 
-## Sequelize and sequelize-cli Commands
+### 1. Clone the Repository
 
-### Model and Migration Commands
-- **Generate a model and migration**:
-  ```bash
-  npx sequelize model:generate --name User --attributes firstName:string,lastName:string,email:string,password:string
-  ```
-  Creates:
-  - `models/user.js`: Model file
-  - `migrations/YYYYMMDDHHMMSS-create-user.js`: Migration file
+```bash
+git clone https://github.com/bhalani-madhav/Eventify-Backend.git
+cd Eventify-Backend
+````
 
-- **Generate a migration (without model)**:
-  ```bash
-  npx sequelize migration:generate --name add-column-to-users
-  ```
-  Creates a blank migration file (e.g., `migrations/YYYYMMDDHHMMSS-add-column-to-users.js`).
+---
 
-### Running Migrations
-- **Apply all pending migrations**:
-  ```bash
-  npx sequelize db:migrate
-  ```
-  Runs `up` function of unapplied migrations, creating tables in the database.
+### 2. Install Dependencies
 
-- **Undo the last migration**:
-  ```bash
-  npx sequelize db:migrate:undo
-  ```
-  Runs `down` function of the most recent migration.
+```bash
+npm install
+```
 
-- **Undo all migrations**:
-  ```bash
-  npx sequelize db:migrate:undo:all
-  ```
-  Drops all tables created by migrations (use with caution).
+---
 
-- **Check migration status**:
-  ```bash
-  npx sequelize db:migrate:status
-  ```
-  Lists applied (`up`) and pending (`down`) migrations.
+### 3. Setup `.env` File
 
-### Seeder Commands
-- **Generate a seeder**:
-  ```bash
-  npx sequelize seed:generate --name demo-users
-  ```
-  Creates a seeder file (e.g., `seeders/YYYYMMDDHHMMSS-demo-users.js`).
+Create a `.env` file in the root directory and add the following content (modify the values as per your setup):
 
-- **Run all seeders**:
-  ```bash
-  npx sequelize db:seed:all
-  ```
-  Inserts data from all seeder files.
+```env
+JWT_SECRET=YOUR_JWT_SECRET
+PORT=YOUR_PORT_NO
+USERNAME=YOUR_DB_USERNAME
+PASSWORD=YOUR_DB_PASSWORD
+DB_NAME=YOUR_DB_NAME
+HOST=YOUR_HOST
+```
 
-- **Undo all seeders**:
-  ```bash
-  npx sequelize db:seed:undo:all
-  ```
-  Removes data inserted by seeders.
+> ⚠️ **Never commit your `.env` file to GitHub.** Ensure `.env` is listed in your `.gitignore`.
 
-- **Run a specific seeder**:
-  ```bash
-  npx sequelize db:seed --seed YYYYMMDDHHMMSS-demo-users.js
-  ```
+---
 
-- **Undo a specific seeder**:
-  ```bash
-  npx sequelize db:seed:undo --seed YYYYMMDDHHMMSS-demo-users.js
-  ```
+### 4. Configure the Database
 
-### Database Commands
-- **Create a database** (if not already created):
-  ```bash
-  npx sequelize db:create
-  ```
+Ensure PostgreSQL is running locally, and that your credentials in the `.env` file are correct.
 
-- **Drop a database** (use with caution):
-  ```bash
-  npx sequelize db:drop
-  ```
+Then create the database using Sequelize CLI:
 
-## Express App with Sequelize
+```bash
+npx sequelize db:create
+```
 
-### Basic Express Setup
-Below is a basic Express app integrated with Sequelize for database connectivity and model usage.
+---
 
-1. **Create `app.js`**:
-   ```javascript
-   const express = require('express');
-   const { sequelize } = require('./models'); // Auto-generated by sequelize init
-   const User = require('./models/user'); // Example model
+### ⚠️ Important: Initialize Tables
 
-   const app = express();
-   app.use(express.json()); // Parse JSON bodies
+Before starting the server for the first time, run the following command **once** to initialize all tables:
 
-   // Test database connection
-   async function connectToDatabase() {
-     try {
-       await sequelize.authenticate();
-       console.log('Database connection successful!');
-     } catch (error) {
-       console.error('Unable to connect to the database:', error);
-       process.exit(1);
-     }
-   }
+```bash
+node init-tables.js
+```
 
-   // Basic route to test User model
-   app.get('/users', async (req, res) => {
-     try {
-       const users = await User.findAll();
-       res.json(users);
-     } catch (error) {
-       res.status(500).json({ error: error.message });
-     }
-   });
+> ⚠️ This executes `sequelize.sync({ force: true })`, which drops and recreates all tables. Avoid running this on production environments.
 
-   // Create a user
-   app.post('/users', async (req, res) => {
-     try {
-       const user = await User.create(req.body);
-       res.status(201).json(user);
-     } catch (error) {
-       res.status(400).json({ error: error.message });
-     }
-   });
+---
 
-   // Start server
-   const PORT = process.env.PORT || 3000;
-   app.listen(PORT, async () => {
-     await connectToDatabase();
-     console.log(`Server running on port ${PORT}`);
-   });
-   ```
+### 5. Start the Server
 
-2. **Run the Express app**:
-   ```bash
-   node app.js
-   ```
-   The server starts on `http://localhost:3000`.
+```bash
+nodemon app.js
+```
 
-3. **Test API endpoints**:
-   - **Get all users**: `GET http://localhost:3000/users`
-   - **Create a user**: `POST http://localhost:3000/users`
-     Example request body:
-     ```json
-     {
-       "firstName": "Alice",
-       "lastName": "Smith",
-       "email": "alice@example.com",
-       "password": "secure123"
-     }
-     ```
+The server should now be running at [http://localhost:YOUR_PORT_NO](http://localhost:3000)
 
-### Sequelize Model Example
-Below is an example of a Sequelize model file (auto-generated by `model:generate`).
+---
 
-- **Model file** (`models/user.js`):
-  ```javascript
-  const { Model, DataTypes } = require('sequelize');
-  const sequelize = require('../config/database');
+## 🔐 Authentication
 
-  class User extends Model {}
-  User.init(
-    {
-      firstName: { type: DataTypes.STRING, allowNull: false },
-      lastName: { type: DataTypes.STRING, allowNull: false },
-      email: { type: DataTypes.STRING, allowNull: false, unique: true },
-      password: { type: DataTypes.STRING, allowNull: false },
-    },
-    {
-      sequelize,
-      modelName: 'User',
-      tableName: 'Users',
-      timestamps: true, // Enable createdAt/updatedAt
-    }
-  );
+JWT-based authentication is implemented using Passport.js. Protected routes require a valid JWT in the `Authorization` header.
 
-  module.exports = User;
-  ```
+---
 
-### Migration Example
-Below is an example of a migration file (auto-generated by `model:generate`).
+## 📡 API Endpoints
 
-- **Migration file** (`migrations/YYYYMMDDHHMMSS-create-user.js`):
-  ```javascript
-  module.exports = {
-    up: async (queryInterface, Sequelize) => {
-      await queryInterface.createTable('Users', {
-        id: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        firstName: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        lastName: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        email: {
-          type: Sequelize.STRING,
-          allowNull: false,
-          unique: true,
-        },
-        password: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        createdAt: {
-          type: Sequelize.DATE,
-          allowNull: false,
-        },
-        updatedAt: {
-          type: Sequelize.DATE,
-          allowNull: false,
-        },
-      });
-    },
-    down: async (queryInterface) => {
-      await queryInterface.dropTable('Users');
-    },
-  };
-  ```
+### 👤 Users
 
-### Seeder Example
-Below is an example of a seeder file to populate the `Users` table.
+* **Register**
+  `POST /register`
+  Create a new user account.
 
-- **Seeder file** (`seeders/YYYYMMDDHHMMSS-demo-users.js`):
-  ```javascript
-  module.exports = {
-    up: async (queryInterface, Sequelize) => {
-      await queryInterface.bulkInsert('Users', [
-        {
-          firstName: 'Alice',
-          lastName: 'Smith',
-          email: 'alice@example.com',
-          password: 'hashed_password', // Replace with bcrypt hash
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          firstName: 'Bob',
-          lastName: 'Jones',
-          email: 'bob@example.com',
-          password: 'hashed_password',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ], {});
-    },
-    down: async (queryInterface) => {
-      await queryInterface.bulkDelete('Users', null, {});
-    },
-  };
-  ```
+* **Login**
+  `POST /login`
+  Authenticate user and receive a JWT.
 
-## Common Sequelize Operations
+* **Logout**
+  `POST /logout` *(Protected)*
+  Logs out the authenticated user.
 
-### Connecting to the Database
-- **Authenticate connection**:
-  ```javascript
-  await sequelize.authenticate();
-  ```
+---
 
-### Querying with Models
-- **Find all records**:
-  ```javascript
-  const users = await User.findAll();
-  ```
+### ⏰ Reminders *(All routes protected)*
 
-- **Find by primary key**:
-  ```javascript
-  const user = await User.findByPk(1);
-  ```
+* **Create Reminder**
+  `POST /reminders/`
+  Add a new reminder.
 
-- **Create a record**:
-  ```javascript
-  const user = await User.create({ firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', password: 'secure123' });
-  ```
+* **List Reminders (Pagination)**
+  `GET /reminders/`
+  Fetch reminders with server-side pagination.
 
-- **Update a record**:
-  ```javascript
-  await User.update({ email: 'new.email@example.com' }, { where: { id: 1 } });
-  ```
+* **Edit Reminder**
+  `PUT /reminders/:id`
+  Update an existing reminder by ID.
 
-- **Delete a record**:
-  ```javascript
-  await User.destroy({ where: { id: 1 } });
-  ```
+* **Delete Reminder**
+  `DELETE /reminders/:id`
+  Remove a reminder by ID.
 
-### Adding a New Column (Migration)
-- **Generate migration**:
-  ```bash
-  npx sequelize migration:generate --name add-phone-to-users
-  ```
-- **Edit migration**:
-  ```javascript
-  module.exports = {
-    up: async (queryInterface, Sequelize) => {
-      await queryInterface.addColumn('Users', 'phone', {
-        type: Sequelize.STRING,
-        allowNull: true,
-      });
-    },
-    down: async (queryInterface) => {
-      await queryInterface.removeColumn('Users', 'phone');
-    },
-  };
-  ```
+* **Get Reminder by ID**
+  `GET /reminders/:id`
+  Fetch a specific reminder's details.
 
-### Modifying a Column (Migration)
-- **Generate migration**:
-  ```bash
-  npx sequelize migration:generate --name modify-email-users
-  ```
-- **Edit migration**:
-  ```javascript
-  module.exports = {
-    up: async (queryInterface, Sequelize) => {
-      await queryInterface.changeColumn('Users', 'email', {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      });
-    },
-    down: async (queryInterface, Sequelize) => {
-      await queryInterface.changeColumn('Users', 'email', {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: false,
-      });
-    },
-  };
-  ```
 
-## Troubleshooting
+---
 
-- **Connection errors**:
-  - Verify `config/config.json` credentials and ensure PostgreSQL is running.
-  - Check database name, username, password, host, and port.
+## 📬 Feedback
 
-- **Migration errors**:
-  - Ensure migrations are applied in order (`db:migrate`).
-  - Check `SequelizeMeta` table for applied migrations:
-    ```sql
-    SELECT * FROM "SequelizeMeta";
-    ```
+Found a bug or have a suggestion? Feel free to open an issue or contribute!
 
-- **Model not found**:
-  - Ensure `models/index.js` is correctly loading models.
-  - Verify model names match table names (`modelName` and `tableName`).
 
-- **Data type issues**:
-  - Use Sequelize data types (e.g., `Sequelize.STRING`, `Sequelize.INTEGER`, `Sequelize.UUID`) in migrations and models.
-
-## Running the Project
-1. **Apply migrations**:
-   ```bash
-   npx sequelize db:migrate
-   ```
-
-2. **Seed data (optional)**:
-   ```bash
-   npx sequelize db:seed:all
-   ```
-
-3. **Start the Express server**:
-   ```bash
-   node app.js
-   ```
-
-4. **Access the API**:
-   - `GET /users`: List all users
-   - `POST /users`: Create a user
-
-## Best Practices
-- **Use migrations** for all schema changes (avoid `sequelize.sync` in production).
-- **Commit** `migrations`, `models`, and `seeders` to Git for version control.
-- **Test migrations** in a development database before production.
-- **Validate inputs** in Express routes to avoid database errors.
-- **Secure passwords** with `bcrypt` using a `beforeCreate` hook.
-- **Backup data** before undoing migrations or seeding.
-
-## Resources
-- [Sequelize Documentation](https://sequelize.org/)
-- [sequelize-cli Documentation](https://github.com/sequelize/cli)
-- [Express Documentation](https://expressjs.com/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
