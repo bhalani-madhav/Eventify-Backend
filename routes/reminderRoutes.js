@@ -27,6 +27,12 @@ router.delete(
   reminder.deleteReminder
 );
 
+router.get(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  reminder.singleReminder
+);
+
 // router.get(
 //   "/pagination",
 //   passport.authenticate("jwt", { session: false }),
