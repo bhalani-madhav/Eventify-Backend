@@ -4,23 +4,20 @@ const user = require("../controllers/userControllers");
 const passport = require("passport");
 const { authCheck } = require("../auth/authCheck");
 
-router.get(
-  "/secret",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    const user = req.user;
-    res.send(
-      "welcome authenticated user: " + user.firstName + " " + user.lastName
-    );
-  }
-);
+
+
+//sign up api
 router.post("/register", user.registerUser);
+
+//login api
 router.post("/login", user.loginUser);
+//logout api
 router.post(
   "/logout",
   passport.authenticate("jwt", { session: false }),
   user.logoutUser
 );
+
 
 router.get(
   "/authCheck",

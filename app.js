@@ -38,16 +38,7 @@ const connect = async () => {
   }
 };
 connect();
-//sync database
-const syncDB = async () => {
-  try {
-    await sequelize.sync({ alter: true });
-    console.log("Database synchronized successfully.");
-  } catch (error) {
-    console.error("Unable to sync the database:", error);
-  }
-};
-// syncDB();
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
