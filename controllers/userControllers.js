@@ -1,6 +1,7 @@
+require("dotenv").config();
 const { Users } = require("../models/");
 const bcrypt = require("bcrypt");
-const key = "santaClause90*32@@";
+const key = process.env.JWT_SECRET;
 const jwt = require("jsonwebtoken");
 const { ValidationErrorItem } = require("sequelize");
 
